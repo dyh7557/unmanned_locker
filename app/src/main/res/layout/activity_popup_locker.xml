@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/white"
+    tools:context=".popup_locker"
+    >
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        >
+
+        <TextView
+            android:id="@+id/popup_name"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="intent 정보"
+            android:textSize="20dp"
+            android:textColor="@color/black"
+            android:background="#ff7a00"
+            />
+        <Button
+            android:id="@+id/popup_back"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="  &lt;  "
+            android:textSize="30dp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:padding="0dp"
+            android:backgroundTint="@android:color/transparent"
+            />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/popup_index"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="intent 값"
+        android:textColor="@color/black"
+        android:textSize="15dp"
+        android:gravity="center"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        >
+
+        <Button
+            android:id="@+id/key_create"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:padding="10dp"
+            android:background="@android:color/holo_green_light"
+            android:text="key 발급"
+            />
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity"
+    android:gravity="center"
+    >
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:src="@drawable/title"/>
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="락매스터"
+        android:textSize="50dp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:gravity="center"
+        />
+    <TextView
+        android:id="@+id/subtextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="LockMstr"
+        android:textSize="25dp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:layout_marginBottom="30dp"
+        android:gravity="center"
+        />
+    <Button
+        android:id="@+id/button_lockerJoin"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/black"
+        android:text="사물함 조회"
+        android:textStyle="bold"/>
+
+    <Button
+        android:id="@+id/button_cardJoin"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/black"
+        android:textStyle="bold"
+        android:text="카드키 조회" />
+</LinearLayout>
