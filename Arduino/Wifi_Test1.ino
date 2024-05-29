@@ -1,5 +1,3 @@
-#include <ArduinoJson.h>
-#include <ArduinoJson.hpp>
 #include <SoftwareSerial.h>
 #include <MFRC522v2.h>
 #include <MFRC522DriverSPI.h>
