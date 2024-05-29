@@ -14,11 +14,11 @@
 #define ECHO_PIN 10
 #define LOCKER_DISTANCE 12  // 사물함 사이즈에 맞춰 조정
 
-const uint8_t SERVO_PIN{ 8U };  // 서보모터
+const uint8_t SERVO_PIN{ 8 };  // 서보모터
 
 
 enum RGB {  //RGB_LED
-  RED = 22,
+  RED = 24,
   GREEN,
   BLUE
 };
@@ -27,8 +27,8 @@ enum RGB {  //RGB_LED
 #define PASSWORD "12345678"  //네트워크 비밀번호
 
 String cmd;
-String cardUID;
-int mode = 0;
+String cardUID = "f9d59124";//ff412f
+int mode = 0; // 0이면 문 닫힌상태, 1이면 문 열린상태
 
 MFRC522DriverPinSimple sda_pin(SDA_PIN);
 MFRC522DriverSPI driver = sda_pin;
@@ -51,7 +51,7 @@ boolean db_key(String char_input) {  // DB에 키값이 있는지 확인
 
   Serial.println("Send data...");
   String uid = char_input;
-  cmd = "GET /select_key.php?uid=" + uid + " HTTP/1.0\r\n\r\n";
+  cmd = "GET /select_key.php?uid=" + uid + " HTTP/1.1\r\n\r\n";
   ESP_wifi.print("AT+CIPSEND=");
   ESP_wifi.println(cmd.length());
   Serial.print("AT+CIPSEND=");
@@ -85,7 +85,7 @@ void is_something(String char_input, String some) { // 물건이 들어있으면
 
   Serial.println("Send data...");
   String uid = char_input;
-  cmd = "GET /is_something.php?uid=" + uid + "&some=" + some + " HTTP/1.0\r\n" + "Host: jukson.dothome.co.kr/r/n" + "Connection: close\r\n\r\n";
+  cmd = "GET /is_something.php?uid=" + uid + "&some=" + some + " HTTP/1.1\r\n" + "Host: jukson.dothome.co.kr/r/n" + "Connection: close\r\n\r\n";
   ESP_wifi.print("AT+CIPSEND=");
   ESP_wifi.println("3," + cmd.length());
   Serial.print("AT+CIPSEND=");
@@ -106,34 +106,6 @@ void is_something(String char_input, String some) { // 물건이 들어있으면
   ESP_wifi.println("AT_CIPCLOSE");
   delay(100);
 }
-
-
-// DynamicJsonDocument doc(1024); // Adjust buffer size as needed
-
-// void parseLockersJson(String json) { // get_lockers.php에서 use_uid 뽑기
-//   // Parse the JSON string
-//   deserializeJson(doc, json);
-
-//   // Check for parsing errors
-//   if (deserializeJson(doc, json) == JsonDeserializationError) {
-//     Serial.println(F("Failed to parse JSON"));
-//     return;
-//   }
-
-//   // Get the JSON array
-//   JsonArray lockers = doc["data"]; // Assuming "data" is the key for the array
-
-//   // Iterate through each object in the array
-//   for (int i = 0; i < lockers.size(); i++) {
-//     JsonObject locker = lockers[i];
-
-//     // Extract the use_uid
-//     String useUid = locker["use_uid"];
-
-//     // Process the useUid data (e.g., print it)
-//     Serial.println(useUid);
-//   }
-// }
 
 
 void setup() {
@@ -171,10 +143,12 @@ void setup() {
     while (1)
       ;
   }
+  Serial.println("카드를 입력하세요 ");
 }
 
 void loop() {
   if (!mfrc522.PICC_IsNewCardPresent()) return;  // RFID 인식
+  Serial.println("카드 인식됨");
   if (!mfrc522.PICC_ReadCardSerial()) return;
   String uidString = "";
   for (byte i = 0; i < mfrc522.uid.size; i++) {
@@ -184,9 +158,7 @@ void loop() {
   Serial.println(uidString);
 
   if (mode == 0) {  // 사물함 문 여는 코드
-    // DB 조회 시 use_uid는 일치하는데 end_date가 지나있으면 DB에서 삭제(코드 + php구현필요)
-
-    if (db_key(uidString)) {  // DB 확인 후 카드키 조회if (db_key(uidString))
+    if (db_key(uidString)) {  // DB 확인 후 카드키 조회
       Serial.println("문이 열립니다");
       cardUID = uidString;
       rgb_set(0, 0, 150);
@@ -196,21 +168,28 @@ void loop() {
       }
       delay(1000);
       mode = 1;
+      Serial.println("문 열림");
+      return;
     } else { // DB에 없으면 
-      Serial.println("DB에 키없음");
+      Serial.println("등록되지 않은 카드입니다");
       for (int i{ 0 }; i < 3; i++) {
         rgb_set(150, 0, 0);
         delay(500);
         rgb_set(0, 0, 0);
         delay(500);
-        mfrc522.PICC_HaltA();
-        delay(1000);
       }
+      mfrc522.PICC_HaltA();
+      delay(1000);
     }
   }
 
-  else if (mode == 1) {  //사물함 문 닫는 코드
-    //문 닫음
+  else if(mode == 1){  //사물함 문 닫는 코드
+    문 닫음
+    if(!cardUID.equals(uidString)) {
+      Serial.println("잘못된 카드입니다");
+      delay(1000);
+      return;
+    }
     Serial.println("문이 닫힙니다");
     for (int i{ 255 }; i >= 0; i -= 5) {
       analogWrite(SERVO_PIN, i);
@@ -241,13 +220,18 @@ void loop() {
         Serial.println("Object is far away.");
       }
     }
-    //DB 연결 후 물건 있는지 업데이트(업데이트용 php 구현 예정) - is_something.php
+    //DB 연결 후 물건 있는지 업데이트
     String isSomething;
     if(count > 5) isSomething = "TRUE"; // 사물함에 물건이 있으면
     else isSomething = "FALSE";
     is_something(cardUID, isSomething);
+    if(count > 5) Serial.println("사물함에 물건이 있습니다");
+    else Serial.println("사물함이 비어있습니다");
     //종료
     mfrc522.PICC_HaltA();
+    mode = 0;
     delay(1000);
   }
+
+
 }
